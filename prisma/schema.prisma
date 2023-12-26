@@ -1,0 +1,73 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Profile {
+  id           String @id @default(cuid())
+  fatherName   String
+  fatherNumber String
+  roomNo       String
+  hostelName   String
+  user         User   @relation(fields: [userId], references: [id])
+  userId       String @unique
+}
+
+model User {
+  id            String         @id @default(cuid())
+  name          String?
+  collegeId     String?        @unique
+  emailVerified DateTime?
+  image         String?
+  role          Role
+  password      String
+  createdAt     DateTime       @default(now())
+  profile       Profile?
+  Issue         Issue[]
+  satisfaction  Satisfaction[]
+}
+
+model Issue {
+  id        String   @id @default(cuid())
+  type      Issues
+  stars     String
+  comment   String
+  createdAt DateTime @default(now())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Satisfaction {
+  id        String   @id @default(cuid())
+  type      Problems
+  satisfied Boolean
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum Problems {
+  FOOD
+  MEDICAL
+  WATER
+  TOILET
+  GYM
+}
+
+enum Role {
+  STUDENT
+  PARENT
+  WARDEN
+  SYSADMIN
+  DSW
+}
+
+enum Issues {
+  MESS
+  SWEEPER
+  LAUNDRY
+  INTERNET
+}
